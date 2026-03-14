@@ -28,6 +28,8 @@ secret-store/
 │   ├── crypto.py               # 加密/解密模块
 │   ├── database.py             # SQLite 数据库连接
 │   ├── requirements.txt        # Python 依赖
+│   ├── .env                    # 环境变量配置（不提交到git）
+│   ├── .env.example            # 环境变量示例
 │   └── secrets.db              # SQLite 数据库文件（运行后生成）
 ├── frontend/
 │   ├── index.html              # 登录/注册页面
@@ -38,8 +40,6 @@ secret-store/
 │   └── dashboard.js            # 密钥管理逻辑
 ├── .gitignore                   # Git 忽略文件配置
 ├── docker-compose.yml          # Docker Compose 配置
-├── Dockerfile                   # Docker 镜像配置
-├── Makefile                    # Make 命令快捷方式
 └── README.md                   # 项目说明文档（本文件）
 ```
 
@@ -54,41 +54,37 @@ secret-store/
 
 #### 2. 配置环境变量
 
-```bash
-# 克隆项目
-git clone <repository-url>
-cd secret-store
+后端环境变量统一由 `backend/.env` 文件管理。
 
-# 生成安全的密钥
-make key-gen
+编辑 `backend/.env` 文件：
+
+```bash
+# JWT Secret Key - 请在生产环境中使用强随机字符串
+# 生成方法: python -c "import secrets; print(secrets.token_urlsafe(32))"
+SECRET_KEY=your-secret-key-change-this-in-production
+
+# 数据库路径（可选，默认为 sqlite:///secrets.db）
+# DATABASE_URL=sqlite:///secrets.db
 ```
 
-编辑生成的 `.env` 文件，确认配置正确。
+**安全提示**：请务必修改 `SECRET_KEY` 为强随机值！
 
 #### 3. 启动服务
 
 ```bash
-# 使用 Makefile（推荐）
-make up
-
-# 或直接使用 docker-compose
+# 启动所有服务
 docker-compose up -d
+
+# 查看日志
+docker-compose logs -f
+
+# 停止服务
+docker-compose down
 ```
 
 #### 4. 访问应用
 
 打开浏览器访问: **http://localhost:8080**
-
-#### 5. 常用命令
-
-```bash
-make help        # 显示所有可用命令
-make logs        # 查看日志
-make restart     # 重启服务
-make backup      # 备份数据库
-make down        # 停止服务
-make clean       # 清理容器和镜像
-```
 
 ### 方式二：本地开发
 
@@ -104,7 +100,11 @@ cd backend
 pip install -r requirements.txt
 ```
 
-#### 3. 启动后端服务
+#### 3. 配置环境变量
+
+编辑 `backend/.env` 文件（参考上方Docker部署章节）
+
+#### 4. 启动后端服务
 
 ```bash
 cd backend
@@ -113,7 +113,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 后端服务将在 http://localhost:8000 启动
 
-#### 4. 启动前端服务
+#### 5. 启动前端服务
 
 ```bash
 cd frontend
@@ -247,7 +247,7 @@ python -m http.server 8080
 ### DevOps
 - **Docker**: 容器化部署
 - **Docker Compose**: 多容器编排
-- **Makefile**: 命令快捷方式
+- **环境变量**: python-dotenv 管理
 
 ## 📡 API 接口
 
@@ -448,11 +448,12 @@ python -m http.server 8080
 ### 数据备份
 
 ```bash
-# 备份数据库
-make backup
+# 备份数据库（Docker部署）
+docker exec secret-store-backend cp /data/secrets.db /data/secrets_backup_$(date +%Y%m%d_%H%M%S).db
+docker cp secret-store-backend:/data/secrets_backup_$(date +%Y%m%d_%H%M%S).db ./
 
-# 备份文件会保存到 backups/ 目录
-# 文件名格式: secrets_YYYYMMDD_HHMMSS.db
+# 本地开发部署
+cp backend/secrets.db ./secrets_backup_$(date +%Y%m%d_%H%M%S).db
 ```
 
 ## 🎯 路线图

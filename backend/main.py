@@ -4,6 +4,11 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from typing import List
 import base64
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 from database import get_db, init_db
 from models import User, Secret
