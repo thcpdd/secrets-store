@@ -1,10 +1,4 @@
-// Auto-detect API base URL
-// In Docker environment (accessed via localhost:8080), use relative path
-// In local development (accessed directly), use full URL
-const API_BASE_URL = (window.location.port === '8080' || window.location.hostname === 'localhost')
-    ? ''  // Use relative path in Docker
-    : 'http://localhost:8000';  // Use full URL in local dev
-
+// const API_BASE_URL = "";
 
 // Helper function to get auth headers
 function getAuthHeaders() {
