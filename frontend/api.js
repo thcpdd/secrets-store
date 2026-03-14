@@ -1,4 +1,4 @@
-// const API_BASE_URL = "";
+const API_BASE_URL = "";
 
 // Helper function to get auth headers
 function getAuthHeaders() {
