@@ -1,0 +1,31 @@
+FROM nginx:alpine
+
+# Copy static files to nginx html directory
+COPY *.html *.js /usr/share/nginx/html/
+
+# Create nginx configuration
+RUN echo 'server { \
+    listen 80; \
+    server_name localhost; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    \
+    location / { \
+        try_files $uri $uri/ /index.html; \
+    } \
+    \
+    location /api/ { \
+        proxy_pass http://backend:8000/api/; \
+        proxy_set_header Host $host; \
+        proxy_set_header X-Real-IP $remote_addr; \
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; \
+        proxy_set_header X-Forwarded-Proto $scheme; \
+    } \
+    \
+    gzip on; \
+    gzip_types text/plain text/css application/json application/javascript; \
+}' > /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
