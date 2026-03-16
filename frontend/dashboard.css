@@ -651,10 +651,10 @@ color: var(--accent-cyan);
 
 .table-note {
 color: var(--text-secondary);
-max-width: 300px;
-overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;
+max-width: 400px;
+white-space: pre-wrap;
+word-wrap: break-word;
+line-height: 1.5;
 }
 
 .table-date {

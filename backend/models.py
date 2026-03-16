@@ -21,7 +21,7 @@ class Secret(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     name = Column(String, nullable=False)
     encrypted_content = Column(Text, nullable=False)
-    encrypted_note = Column(Text, nullable=True)
+    note = Column(Text, nullable=True)  # Plaintext note (no encryption)
     nonce = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

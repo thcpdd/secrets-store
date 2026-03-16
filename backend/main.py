@@ -122,28 +122,23 @@ def create_secret(
     salt = bytes.fromhex(current_user.salt)
     encryption_key = derive_key(secret.password, salt)
 
-    # Generate nonce once for this secret (used for both content and note)
+    # Generate nonce for content encryption
     from crypto import AES_NONCE_LENGTH
     import os
     nonce_bytes = os.urandom(AES_NONCE_LENGTH)
 
-    # Encrypt content with the shared nonce
+    # Encrypt content
     encrypted_content, _ = encrypt_data(secret.content, encryption_key, nonce_bytes)
-
-    # Encrypt note if provided with the same nonce
-    encrypted_note = None
-    if secret.note:
-        encrypted_note, _ = encrypt_data(secret.note, encryption_key, nonce_bytes)
 
     # Save nonce as base64 string in database
     nonce_b64 = base64.b64encode(nonce_bytes).decode('utf-8')
 
-    # Create secret
+    # Create secret (note is stored as plaintext)
     db_secret = Secret(
         user_id=current_user.id,
         name=secret.name,
         encrypted_content=encrypted_content,
-        encrypted_note=encrypted_note,
+        note=secret.note,  # Note is stored as plaintext (no encryption)
         nonce=nonce_b64
     )
     db.add(db_secret)
@@ -190,16 +185,12 @@ def reveal_secret(
     try:
         content = decrypt_data(secret.encrypted_content, nonce_bytes, encryption_key)
 
-        # Decrypt note if exists
-        note = None
-        if secret.encrypted_note:
-            note = decrypt_data(secret.encrypted_note, nonce_bytes, encryption_key)
-
+        # Note is stored as plaintext, no decryption needed
         return SecretDetail(
             id=secret.id,
             name=secret.name,
             content=content,
-            note=note,
+            note=secret.note,
             created_at=secret.created_at,
             updated_at=secret.updated_at
         )
@@ -246,35 +237,22 @@ def update_secret(
     if secret_update.name:
         secret.name = secret_update.name
 
-    # If updating content or note, we need to re-encrypt with a new nonce
-    if secret_update.content or secret_update.note is not None:
+    # If updating content, we need to re-encrypt with a new nonce
+    if secret_update.content:
         # Generate new nonce
         from crypto import AES_NONCE_LENGTH
         import os
         nonce_bytes = os.urandom(AES_NONCE_LENGTH)
         nonce_b64 = base64.b64encode(nonce_bytes).decode('utf-8')
 
-        # Re-encrypt content if provided
-        if secret_update.content:
-            encrypted_content, _ = encrypt_data(secret_update.content, encryption_key, nonce_bytes)
-            secret.encrypted_content = encrypted_content
-        else:
-            # Keep existing content but need to re-encrypt with new nonce
-            old_nonce = base64.b64decode(secret.nonce)
-            old_content = decrypt_data(secret.encrypted_content, old_nonce, encryption_key)
-            encrypted_content, _ = encrypt_data(old_content, encryption_key, nonce_bytes)
-            secret.encrypted_content = encrypted_content
-
-        # Handle note update
-        if secret_update.note is not None:
-            if secret_update.note:
-                encrypted_note, _ = encrypt_data(secret_update.note, encryption_key, nonce_bytes)
-                secret.encrypted_note = encrypted_note
-            else:
-                secret.encrypted_note = None
-
-        # Update nonce
+        # Re-encrypt content
+        encrypted_content, _ = encrypt_data(secret_update.content, encryption_key, nonce_bytes)
+        secret.encrypted_content = encrypted_content
         secret.nonce = nonce_b64
+
+    # Update note (stored as plaintext, no encryption)
+    if secret_update.note is not None:
+        secret.note = secret_update.note
 
     db.commit()
     db.refresh(secret)

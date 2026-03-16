@@ -41,6 +41,7 @@ class SecretUpdate(BaseModel):
 class SecretResponse(BaseModel):
     id: int
     name: str
+    note: Optional[str] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
 
