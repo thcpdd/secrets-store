@@ -167,8 +167,8 @@ box-shadow: var(--shadow-brutal);
 }
 
 .logo-icon svg {
-width: 24px;
-height: 24px;
+width: 32px;
+height: 32px;
 color: var(--bg-primary);
 }
 
@@ -217,6 +217,11 @@ border-color: var(--accent-cyan);
 color: var(--accent-cyan);
 transform: translate(-2px, -2px);
 box-shadow: var(--shadow-brutal-lg);
+}
+
+.btn-theme:active {
+transform: translate(0, 0);
+box-shadow: var(--shadow-brutal);
 }
 
 .btn-theme svg {
@@ -406,6 +411,11 @@ transform: translate(-2px, -2px);
 box-shadow: var(--shadow-brutal-lg);
 }
 
+.btn-add:active {
+transform: translate(0, 0);
+box-shadow: var(--shadow-brutal);
+}
+
 .btn-add svg {
 width: 18px;
 height: 18px;
@@ -541,6 +551,36 @@ transform: translate(-2px, -2px);
 box-shadow: var(--shadow-brutal-lg);
 }
 
+.btn-submit:active {
+transform: translate(0, 0);
+box-shadow: var(--shadow-brutal);
+}
+
+.btn-submit.loading {
+position: relative;
+color: transparent;
+pointer-events: none;
+}
+
+.btn-submit.loading::after {
+content: '';
+position: absolute;
+top: 50%;
+left: 50%;
+width: 20px;
+height: 20px;
+margin-left: -10px;
+margin-top: -10px;
+border: 2px solid var(--bg-primary);
+border-top-color: transparent;
+border-radius: 50%;
+animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+to { transform: rotate(360deg); }
+}
+
 .btn-cancel {
 background: transparent;
 border: 2px solid var(--border-color);
@@ -558,6 +598,10 @@ transition: all 0.2s ease;
 .btn-cancel:hover {
 border-color: var(--text-primary);
 color: var(--text-primary);
+}
+
+.btn-cancel:active {
+transform: translate(1px, 1px);
 }
 
 /* Empty state */
@@ -684,6 +728,11 @@ box-shadow: 2px 2px 0 #000;
 .btn-action:hover {
 transform: translate(-1px, -1px);
 box-shadow: 3px 3px 0 #000;
+}
+
+.btn-action:active {
+transform: translate(0, 0);
+box-shadow: 2px 2px 0 #000;
 }
 
 .btn-view {
@@ -886,6 +935,22 @@ color: var(--text-muted);
 margin-top: 0.5rem;
 }
 
+.secret-copy-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 2px solid var(--success);
+    color: var(--success);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    animation: fade-in 0.3s ease-out;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
 /* Password form */
 .password-error {
 display: none;
@@ -971,6 +1036,32 @@ transform: translate(-2px, -2px);
 box-shadow: var(--shadow-brutal-lg);
 }
 
+.btn-submit-full:active {
+transform: translate(0, 0);
+box-shadow: var(--shadow-brutal);
+}
+
+.btn-submit-full.loading {
+position: relative;
+color: transparent;
+pointer-events: none;
+}
+
+.btn-submit-full.loading::after {
+content: '';
+position: absolute;
+top: 50%;
+left: 50%;
+width: 20px;
+height: 20px;
+margin-left: -10px;
+margin-top: -10px;
+border: 2px solid var(--bg-primary);
+border-top-color: transparent;
+border-radius: 50%;
+animation: spin 0.6s linear infinite;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
 .header {
@@ -1015,6 +1106,57 @@ padding: 0.75rem 1rem;
 padding: 0.4rem 0.75rem;
 font-size: 0.625rem;
 }
+}
+
+/* Loading and animation utilities */
+.rotate {
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn-loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+.table-row-loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.table-row-appear {
+    animation: table-row-slide-in 0.3s ease-out;
+}
+
+@keyframes table-row-slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 /* Utility classes */

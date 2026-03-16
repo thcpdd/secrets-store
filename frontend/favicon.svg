@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background -->
+  <rect width="64" height="64" fill="#0a0e1a" rx="12"/>
+
+  <!-- Shield -->
+  <path d="M32 8 L52 16 V30 C52 42 44 50 32 54 C20 50 12 42 12 30 V16 L32 8Z"
+        fill="#00ff9d" opacity="0.2"/>
+
+  <!-- Key ring -->
+  <circle cx="28" cy="30" r="7" fill="none" stroke="#00ff9d" stroke-width="2.5"/>
+
+  <!-- Key shaft -->
+  <line x1="34" y1="30" x2="46" y2="30" stroke="#00ff9d" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Key teeth -->
+  <line x1="46" y1="30" x2="46" y2="25" stroke="#00ff9d" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="46" y1="30" x2="46" y2="35" stroke="#00ff9d" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="46" y1="25" x2="50" y2="23" stroke="#00ff9d" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="46" y1="35" x2="50" y2="37" stroke="#00ff9d" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Lock body -->
+  <rect x="22" y="37" width="12" height="9" rx="1.5" fill="none" stroke="#00ff9d" stroke-width="2"/>
+  <path d="M25 37 V32 A3.5 3.5 0 0 1 32 32 V37"
+        fill="none" stroke="#00ff9d" stroke-width="2" stroke-linecap="round"/>
+</svg>

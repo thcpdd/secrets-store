@@ -4,24 +4,34 @@ const registerTab = document.getElementById('registerTab');
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 
+// Initialize theme from localStorage (apply theme but no toggle button)
+const savedTheme = localStorage.getItem('theme') || 'default';
+document.documentElement.setAttribute('data-theme', savedTheme);
+
 loginTab.addEventListener('click', () => {
-    loginTab.classList.add('text-blue-600', 'border-blue-600');
-    loginTab.classList.remove('text-gray-500', 'border-transparent');
-    registerTab.classList.remove('text-blue-600', 'border-blue-600');
-    registerTab.classList.add('text-gray-500', 'border-transparent');
+    loginTab.classList.add('active');
+    registerTab.classList.remove('active');
 
     loginForm.classList.remove('hidden');
     registerForm.classList.add('hidden');
+
+    // Re-trigger animation
+    loginForm.classList.remove('tab-content');
+    void loginForm.offsetWidth; // Trigger reflow
+    loginForm.classList.add('tab-content');
 });
 
 registerTab.addEventListener('click', () => {
-    registerTab.classList.add('text-blue-600', 'border-blue-600');
-    registerTab.classList.remove('text-gray-500', 'border-transparent');
-    loginTab.classList.remove('text-blue-600', 'border-blue-600');
-    loginTab.classList.add('text-gray-500', 'border-transparent');
+    registerTab.classList.add('active');
+    loginTab.classList.remove('active');
 
     registerForm.classList.remove('hidden');
     loginForm.classList.add('hidden');
+
+    // Re-trigger animation
+    registerForm.classList.remove('tab-content');
+    void registerForm.offsetWidth; // Trigger reflow
+    registerForm.classList.add('tab-content');
 });
 
 // Show error message
@@ -44,26 +54,50 @@ function showError(message) {
 
     const translatedMessage = errorTranslations[message] || message;
     const errorDiv = document.getElementById('errorMessage');
-    errorDiv.textContent = translatedMessage;
-    errorDiv.classList.remove('hidden');
+    const span = errorDiv.querySelector('span');
+    span.textContent = translatedMessage;
+    errorDiv.classList.add('show');
+
+    // Hide success message
+    document.getElementById('successMessage').classList.remove('show');
+
+    // Auto hide after 5 seconds
     setTimeout(() => {
-        errorDiv.classList.add('hidden');
+        errorDiv.classList.remove('show');
     }, 5000);
 }
 
 // Show success message
 function showSuccess(message) {
     const successDiv = document.getElementById('successMessage');
-    successDiv.textContent = message;
-    successDiv.classList.remove('hidden');
+    const span = successDiv.querySelector('span');
+    span.textContent = message;
+    successDiv.classList.add('show');
+
+    // Hide error message
+    document.getElementById('errorMessage').classList.remove('show');
+
+    // Auto hide after 5 seconds
     setTimeout(() => {
-        successDiv.classList.add('hidden');
+        successDiv.classList.remove('show');
     }, 5000);
 }
 
 // Handle login
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    const submitBtn = loginForm.querySelector('.submit-button');
+    const originalText = submitBtn.querySelector('span').textContent;
+
+    // Add loading state
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+    submitBtn.querySelector('span').textContent = '登录中...';
+
+    // Hide messages
+    document.getElementById('errorMessage').classList.remove('show');
+    document.getElementById('successMessage').classList.remove('show');
 
     const formData = new FormData(loginForm);
     const data = {
@@ -84,13 +118,29 @@ loginForm.addEventListener('submit', async (e) => {
             const result = await response.json();
             localStorage.setItem('token', result.access_token);
             localStorage.setItem('username', data.username);
-            window.location.href = 'dashboard.html';
+
+            // Success animation
+            submitBtn.querySelector('span').textContent = '成功！';
+
+            // Add success pulse animation
+            submitBtn.style.animation = 'success-pulse 0.5s ease-out';
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 800);
         } else {
             const error = await response.json();
             showError(error.detail || '登录失败');
         }
     } catch (error) {
         showError('网络错误，请重试。');
+    } finally {
+        // Remove loading state if not redirecting
+        if (!submitBtn.querySelector('span').textContent.includes('成功')) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('loading');
+            submitBtn.querySelector('span').textContent = originalText;
+        }
     }
 });
 
@@ -98,12 +148,27 @@ loginForm.addEventListener('submit', async (e) => {
 registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    const submitBtn = registerForm.querySelector('.submit-button');
+    const originalText = submitBtn.querySelector('span').textContent;
+
+    // Add loading state
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+    submitBtn.querySelector('span').textContent = '注册中...';
+
+    // Hide messages
+    document.getElementById('errorMessage').classList.remove('show');
+    document.getElementById('successMessage').classList.remove('show');
+
     const formData = new FormData(registerForm);
     const password = formData.get('password');
     const confirmPassword = document.getElementById('confirmPassword').value;
 
     if (password !== confirmPassword) {
         showError('两次输入的密码不匹配');
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+        submitBtn.querySelector('span').textContent = originalText;
         return;
     }
 
@@ -124,27 +189,49 @@ registerForm.addEventListener('submit', async (e) => {
         if (response.ok) {
             showSuccess('注册成功！请登录。');
 
-            // Switch to login tab
-            loginTab.click();
+            // Switch to login tab with animation
+            setTimeout(() => {
+                loginTab.click();
 
-            // Pre-fill username
-            document.getElementById('loginUsername').value = data.username;
+                // Pre-fill username
+                document.getElementById('loginUsername').value = data.username;
 
-            // Clear register form
-            registerForm.reset();
+                // Clear register form
+                registerForm.reset();
+            }, 1000);
         } else {
             const error = await response.json();
             showError(error.detail || '注册失败');
         }
     } catch (error) {
         showError('网络错误，请重试。');
+    } finally {
+        // Remove loading state
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+        submitBtn.querySelector('span').textContent = originalText;
     }
+});
+
+// Add input focus animations
+document.querySelectorAll('.form-input').forEach(input => {
+    input.addEventListener('focus', function() {
+        this.parentElement.classList.add('focused');
+    });
+
+    input.addEventListener('blur', function() {
+        this.parentElement.classList.remove('focused');
+    });
 });
 
 // Check if already logged in
 window.addEventListener('load', () => {
     const token = localStorage.getItem('token');
     if (token) {
-        window.location.href = 'dashboard.html';
+        // Add fade out animation
+        document.body.style.animation = 'fade-out 0.3s ease-out forwards';
+        setTimeout(() => {
+            window.location.href = 'dashboard.html';
+        }, 300);
     }
 });

@@ -99,8 +99,8 @@ async function loadSecrets() {
             secretsList.closest('.table-wrapper').classList.remove('hidden');
             emptyState.classList.remove('show');
 
-            secretsList.innerHTML = secrets.map(secret => `
-                <tr>
+            secretsList.innerHTML = secrets.map((secret, index) => `
+                <tr class="table-row-appear" style="animation-delay: ${index * 0.05}s">
                     <td>${escapeHtml(secret.name)}</td>
                     <td><span class="table-note">${secret.note ? escapeHtml(secret.note) : '-'}</span></td>
                     <td><span class="table-date">${formatDate(secret.created_at)}</span></td>
@@ -143,7 +143,21 @@ function openEditRow(id) {
 // Delete secret confirmation (global function for onclick)
 function deleteSecretConfirm(id) {
     if (confirm('确定要删除这个密钥吗？')) {
-        deleteSecretHandler(id);
+        // Add fade-out animation to the row
+        const rows = document.querySelectorAll('#secretsList tr');
+        rows.forEach(row => {
+            const deleteBtn = row.querySelector('.btn-delete');
+            if (deleteBtn && deleteBtn.onclick.toString().includes(id)) {
+                row.style.transition = 'all 0.3s ease-out';
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(20px)';
+            }
+        });
+
+        // Wait for animation to complete before deleting
+        setTimeout(() => {
+            deleteSecretHandler(id);
+        }, 300);
     }
 }
 
@@ -277,6 +291,13 @@ document.addEventListener('DOMContentLoaded', () => {
     passwordVerifyForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const submitBtn = passwordVerifyForm.querySelector('.btn-submit-full');
+        const originalText = submitBtn.textContent;
+
+        // Add loading state
+        submitBtn.classList.add('loading');
+        submitBtn.textContent = '';
+
         const secretId = document.getElementById('verifySecretId').value;
         const password = document.getElementById('verifyPassword').value;
 
@@ -301,6 +322,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 viewModalTitle.textContent = secret.name;
 
                 let contentHtml = `
+                    <div class="secret-copy-hint" id="copyHint">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span>密钥已复制到剪贴板</span>
+                    </div>
                     <div class="secret-field">
                         <div class="secret-label">密钥内容</div>
                         <div class="secret-content">${escapeHtml(secret.content)}</div>
@@ -321,6 +348,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
 
                 viewModalContent.innerHTML = contentHtml;
+
+                // Copy secret content to clipboard
+                navigator.clipboard.writeText(secret.content).catch(err => {
+                    console.error('Failed to copy:', err);
+                    // Hide copy hint if copy failed
+                    const copyHint = document.getElementById('copyHint');
+                    if (copyHint) copyHint.style.display = 'none';
+                });
 
                 passwordModal.classList.remove('show');
                 viewModal.classList.add('show');
@@ -351,12 +386,23 @@ document.addEventListener('DOMContentLoaded', () => {
             // Clear password field and focus
             document.getElementById('verifyPassword').value = '';
             document.getElementById('verifyPassword').focus();
+        } finally {
+            // Remove loading state
+            submitBtn.classList.remove('loading');
+            submitBtn.textContent = originalText;
         }
     });
 
     // Handle edit form submission
     editSecretForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        const submitBtn = editSecretForm.querySelector('.btn-submit');
+        const originalText = submitBtn.textContent;
+
+        // Add loading state
+        submitBtn.classList.add('loading');
+        submitBtn.textContent = '';
 
         const id = document.getElementById('editSecretId').value;
         const data = {
@@ -375,12 +421,23 @@ document.addEventListener('DOMContentLoaded', () => {
             loadSecrets();
         } catch (error) {
             showError(error.message);
+        } finally {
+            // Remove loading state
+            submitBtn.classList.remove('loading');
+            submitBtn.textContent = originalText;
         }
     });
 
     // Add secret form submission
     addSecretForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        const submitBtn = addSecretForm.querySelector('.btn-submit-full');
+        const originalText = submitBtn.textContent;
+
+        // Add loading state
+        submitBtn.classList.add('loading');
+        submitBtn.textContent = '';
 
         const data = {
             name: document.getElementById('secretName').value,
@@ -408,6 +465,10 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 addSecretError.style.animation = 'shake 0.3s ease-out';
             }, 10);
+        } finally {
+            // Remove loading state
+            submitBtn.classList.remove('loading');
+            submitBtn.textContent = originalText;
         }
     });
 

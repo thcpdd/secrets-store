@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>密钥存储 | 安全保险库</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,8 +16,22 @@
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round"/>
+                    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Shield background -->
+                        <path d="M32 4 L56 14 V32 C56 46 46 56 32 60 C18 56 8 46 8 32 V14 L32 4Z" fill="currentColor" opacity="0.1"/>
+                        <path d="M32 4 L56 14 V32 C56 46 46 56 32 60 C18 56 8 46 8 32 V14 L32 4Z" stroke="currentColor" stroke-width="2" fill="none"/>
+
+                        <!-- Key icon -->
+                        <circle cx="28" cy="30" r="6" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <path d="M33 30 L44 30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M44 30 L44 26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M44 30 L44 34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M44 26 L48 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M44 34 L48 36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+
+                        <!-- Lock symbol overlay -->
+                        <rect x="22" y="36" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                        <path d="M25 36 V32 A3 3 0 0 1 31 32 V36" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
                     </svg>
                 </div>
                 <span class="logo-text">密钥存储</span>
